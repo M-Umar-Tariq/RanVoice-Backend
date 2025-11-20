@@ -36,8 +36,8 @@ if ENV_PATH.exists():
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dl5sotr3$b7zwlt4rvmc2=@8=8_4(w5h+#@9u6ozjeb9lpv&@8'
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -71,6 +71,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://shelteringly-inspirational-pura.ngrok-free.dev",
+    "https://ran-ai-09.web.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://shelteringly-inspirational-pura.ngrok-free.dev",
+    "https://ran-ai-09.web.app",
+]
+
 
 ROOT_URLCONF = 'ranvoicebackend.urls'
 
@@ -110,6 +122,7 @@ DATABASES = {
         'NAME': 'ranvoice',
         'CLIENT': {
             'host': os.getenv('MONGO_URI'),
+            
         }
     }
 }
@@ -139,7 +152,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Karachi'
 
 USE_I18N = True
 
