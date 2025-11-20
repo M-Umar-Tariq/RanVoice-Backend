@@ -40,7 +40,8 @@ if ENV_PATH.exists():
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -74,12 +75,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://shelteringly-inspirational-pura.ngrok-free.dev",
+    # "https://shelteringly-inspirational-pura.ngrok-free.dev",
     "https://ran-ai-09.web.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://shelteringly-inspirational-pura.ngrok-free.dev",
+    # "https://shelteringly-inspirational-pura.ngrok-free.dev",
     "https://ran-ai-09.web.app",
 ]
 
@@ -170,3 +171,14 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
+MIDDLEWARE.insert(2, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
