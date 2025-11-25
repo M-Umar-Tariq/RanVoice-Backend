@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -181,6 +181,349 @@
           setStatus("Starting call... please allow microphone access.");
 
           // 2️⃣ Start the in-browser Retell call
+          await retellWebClient.startCall({ accessToken });
+
+          startBtn.style.display = "none";
+          endBtn.style.display = "inline-block";
+          setStatus("Call in progress with RanVoice AI...");
+
+          // 🎧 Event listeners
+          retellWebClient.on("call_started", () => {
+            setStatus("Call started. You can begin speaking.");
+          });
+
+          retellWebClient.on("call_ended", () => {
+            startBtn.style.display = "inline-block";
+            endBtn.style.display = "none";
+            setStatus("Call ended.");
+          });
+
+          retellWebClient.on("error", (error) => {
+            console.error("Retell error:", error);
+            setStatus("An error occurred during the call.");
+          });
+        } catch (e) {
+          console.error(e);
+          setStatus("Could not start AI call. Check console logs.");
+        }
+      };
+
+      endBtn.onclick = () => {
+        retellWebClient.stopCall();
+        startBtn.style.display = "inline-block";
+        endBtn.style.display = "none";
+        setStatus("Ending call...");
+      };
+    </script>
+  </body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Talk to RanVoice AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+        color: #f9fafb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.95);
+        border-radius: 18px;
+        padding: 24px 28px 26px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+
+      h2 {
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #818cf8;
+        margin: 0 0 0.5rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+        line-height: 1.45;
+        color: #9ca3af;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.2rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(30, 64, 175, 0.3);
+        color: #bfdbfe;
+        font-size: 0.75rem;
+        margin-bottom: 0.8rem;
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #22c55e;
+      }
+
+      /* --- Form styles --- */
+
+      .lead-form {
+        margin-top: 1rem;
+        text-align: left;
+      }
+
+      .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .form-row label {
+        font-size: 0.78rem;
+        color: #9ca3af;
+      }
+
+      .form-row input,
+      .form-row select {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        background: rgba(15, 23, 42, 0.85);
+        color: #e5e7eb;
+        font-size: 0.85rem;
+        outline: none;
+        box-sizing: border-box;
+      }
+
+      .form-row input::placeholder {
+        color: #6b7280;
+      }
+
+      .form-row input:focus,
+      .form-row select:focus {
+        border-color: #818cf8;
+        box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.5);
+      }
+
+      .hint {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.2rem;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 1.1rem;
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.08s ease, box-shadow 0.08s ease,
+          filter 0.08s ease;
+        min-width: 130px;
+      }
+
+      button:active {
+        transform: scale(0.97);
+        box-shadow: none;
+        filter: brightness(0.98);
+      }
+
+      #start-call-btn {
+        background: linear-gradient(135deg, #22c55e, #4ade80);
+        color: #052e16;
+        box-shadow: 0 12px 30px rgba(34, 197, 94, 0.45);
+      }
+
+      #end-call-btn {
+        background: #ef4444;
+        color: #fef2f2;
+        display: none;
+        box-shadow: 0 10px 26px rgba(248, 113, 113, 0.4);
+      }
+
+      .status {
+        margin-top: 0.9rem;
+        font-size: 0.8rem;
+        color: #a5b4fc;
+        min-height: 1.1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="badge">
+        <span class="dot"></span>
+        HIPAA-ready AI Voice Agent
+      </div>
+      <h1>Talk to RanVoice AI</h1>
+      <p>
+        Fill in your details and click below. Our AI voice agent will greet you
+        by name, tailor the conversation to your industry, and explain how
+        RanVoice works.
+      </p>
+
+      <!-- Lead capture form -->
+      <div class="lead-form" id="lead-form">
+        <div class="form-row">
+          <label for="name">Name *</label>
+          <input
+            id="name"
+            type="text"
+            placeholder="e.g. Ali"
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="company-email">Company email *</label>
+          <input
+            id="company-email"
+            type="email"
+            placeholder="you@company.com"
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="phone">Phone number *</label>
+          <input
+            id="phone"
+            type="tel"
+            placeholder="+92 3xx xxx xxxx"
+            autocomplete="tel"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="industry">Industry *</label>
+          <input
+            id="industry"
+            type="text"
+            placeholder="e.g. Real Estate, Healthcare, Legal"
+          />
+          <div class="hint">This helps Lia tailor the demo to your use case.</div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="start-call-btn" type="button">Talk to AI</button>
+        <button id="end-call-btn" type="button">End Call</button>
+      </div>
+
+      <div class="status" id="status"></div>
+    </div>
+
+    <script type="module">
+      import { RetellWebClient } from "https://cdn.jsdelivr.net/npm/retell-client-js-sdk/+esm";
+
+      const retellWebClient = new RetellWebClient();
+
+      const startBtn = document.getElementById("start-call-btn");
+      const endBtn = document.getElementById("end-call-btn");
+      const statusEl = document.getElementById("status");
+
+      const nameInput = document.getElementById("name");
+      const companyEmailInput = document.getElementById("company-email");
+      const phoneInput = document.getElementById("phone");
+      const industryInput = document.getElementById("industry");
+
+      function setStatus(text) {
+        statusEl.textContent = text || "";
+      }
+
+      // const BASE_URL = "http://192.168.100.12:8000";
+      // const BASE_URL = "http://127.0.0.1:8000";
+      const BASE_URL = window.location.origin;
+      // const BASE_URL = "https://shelteringly-inspirational-pura.ngrok-free.dev";
+
+      startBtn.onclick = async () => {
+        try {
+          // 🔹 1) Read and validate form data
+          const name = nameInput.value.trim();
+          const company_email = companyEmailInput.value.trim();
+          const phone = phoneInput.value.trim();
+          const industry = industryInput.value.trim();
+
+          if (!name || !company_email || !phone || !industry) {
+            setStatus("Please fill in all fields before starting the call.");
+            return;
+          }
+
+          setStatus("Creating secure call session...");
+
+          // 🔹 2) Ask backend to create a web call & get accessToken
+          const res = await fetch(`${BASE_URL}/api/retell/create-web-call/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              company_email,
+              phone,
+              industry,
+            }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || "Backend error");
+          }
+
+          const { accessToken } = await res.json();
+
+          if (!accessToken) {
+            throw new Error("No accessToken returned from backend");
+          }
+
+          setStatus("Starting call... please allow microphone access.");
+
+          // 🔹 3) Start the in-browser Retell call
           await retellWebClient.startCall({ accessToken });
 
           startBtn.style.display = "none";
